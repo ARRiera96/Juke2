@@ -1,9 +1,9 @@
 'use strict';
 
 juke.controller('PlayerCtrl', function ($scope, $rootScope, PlayerFactory) {
-  $scope.playing = false;
+  $scope.playing = PlayerFactory.isPlaying();
 
-  
+
   // initialize audio player (note this kind of DOM stuff is odd for Angular)
   // audio.addEventListener('ended', function () {
   //   $scope.next();
@@ -17,19 +17,21 @@ juke.controller('PlayerCtrl', function ($scope, $rootScope, PlayerFactory) {
   // });
 
   // state
-  $scope.currentSong= PlayerFactory.getCurrentSong();
+  // $scope.currentSong= PlayerFactory.getCurrentSong();
   $scope.playing = false;
 
   // main toggle
   $scope.toggle = function (song) {
-    console.log("hellooooooo");
-    if ($scope.playing && song === $scope.currentSong) {
+    console.log('what fucken song are you', song);
+    if (PlayerFactory.isPlaying() && song === PlayerFactory.getCurrentSong()) {
+          console.log("hellooooooo");
           PlayerFactory.pause();
-          $scope.playing= !$scope.playing;
+          $scope.playing= PlayerFactory.isPlaying();
          } else{
+          console.log("second block");
           PlayerFactory.start(song);
           $scope.song= song; 
-          $scope.currentSong= PlayerFactory.getCurrentSong(); 
+          $rootScope.currentSong= PlayerFactory.getCurrentSong(); 
           $scope.playing = PlayerFactory.isPlaying();
          } 
   };
@@ -40,18 +42,16 @@ juke.controller('PlayerCtrl', function ($scope, $rootScope, PlayerFactory) {
 
   // functionality
   function pause () {
-    audio.pause();
+    PlayerFactory.pause();
+    $scope.toggle($scope.currentSong);
     $scope.playing = false;
   }
   function play (event, song){
-    // stop existing audio (e.g. other song) in any case
-    console.log("Joe take my energy");
-    pause();
+    PlayerFactory.pause();
     $scope.playing = true;
     // resume current song
     // enable loading new song
     $scope.currentSong = song;
-    console.log("beneath return");
     PlayerFactory.start($scope.currentSong);
   }
 
