@@ -1,27 +1,37 @@
 'use strict';
 
 juke.controller('PlayerCtrl', function ($scope, $rootScope, PlayerFactory) {
+  $scope.playing = false;
 
+  
   // initialize audio player (note this kind of DOM stuff is odd for Angular)
-  audio.addEventListener('ended', function () {
-    $scope.next();
-    // $scope.$apply(); // triggers $rootScope.$digest, which hits other scopes
-    $scope.$evalAsync(); // likely best, schedules digest if none happening
-  });
-  audio.addEventListener('timeupdate', function () {
-    $scope.progress = 100 * audio.currentTime / audio.duration;
-    // $scope.$digest(); // re-computes current template only (this scope)
-    $scope.$evalAsync(); // likely best, schedules digest if none happening
-  });
+  // audio.addEventListener('ended', function () {
+  //   $scope.next();
+  //   // $scope.$apply(); // triggers $rootScope.$digest, which hits other scopes
+  //   $scope.$evalAsync(); // likely best, schedules digest if none happening
+  // });
+  // audio.addEventListener('timeupdate', function () {
+  //   $scope.progress = 100 * audio.currentTime / audio.duration;
+  //   // $scope.$digest(); // re-computes current template only (this scope)
+  //   $scope.$evalAsync(); // likely best, schedules digest if none happening
+  // });
 
   // state
-  $scope.currentSong;
+  $scope.currentSong= PlayerFactory.getCurrentSong();
   $scope.playing = false;
 
   // main toggle
   $scope.toggle = function (song) {
-    if ($scope.playing) $rootScope.$broadcast('pause');
-    else $rootScope.$broadcast('play', song);
+    console.log("hellooooooo");
+    if ($scope.playing && song === $scope.currentSong) {
+          PlayerFactory.pause();
+          $scope.playing= !$scope.playing;
+         } else{
+          PlayerFactory.start(song);
+          $scope.song= song; 
+          $scope.currentSong= PlayerFactory.getCurrentSong(); 
+          $scope.playing = PlayerFactory.isPlaying();
+         } 
   };
 
   // incoming events (from Album or toggle)
