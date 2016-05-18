@@ -5,20 +5,21 @@ juke.factory('PlayerFactory', function(){
   var audio = document.createElement('audio');
     initialize audio player (note this kind of DOM stuff is odd for Angular)
   audio.addEventListener('ended', function () {
-    $scope.next();
+    objReturn.next();
     // $scope.$apply(); // triggers $rootScope.$digest, which hits other scopes
-    $scope.$evalAsync(); // likely best, schedules digest if none happening
+    $rootScope.$evalAsync(); // likely best, schedules digest if none happening
   });
   audio.addEventListener('timeupdate', function () {
-    $scope.progress = 100 * audio.currentTime / audio.duration;
+    // $scope.progress = 100 * audio.currentTime / audio.duration;
     // $scope.$digest(); // re-computes current template only (this scope)
-    $scope.$evalAsync(); // likely best, schedules digest if none happening
+    $rootScope.progress = objReturn.getProgress();
+    $rootScope.$evalAsync();
+    //$scope.$evalAsync(); // likely best, schedules digest if none happening
   });
   var playing= false; 
   var currentSong= null;
   var songUl;
-
-  return {
+  var objReturn =  {
   	start: function(song, songList){
   		console.log("im in factory", song);
   		//if (song === scope.currentSong) return audio.play();
@@ -66,6 +67,7 @@ juke.factory('PlayerFactory', function(){
   	}
 
   }
+  return objReturn;
 
 
 
